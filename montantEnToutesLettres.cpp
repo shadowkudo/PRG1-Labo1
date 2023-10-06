@@ -16,15 +16,12 @@ int unite(long double& n, int& exposant){
 
 // fonction pour trouver le premier chiffre qui ne vaut pas 0
 int premier(long double n, int exposant){
-    long double first;
-
     // on cherche la valeur > 0
-    while (first < 1) {
+    for (int first = 0; first < 1; exposant--) {
         first = unite(n,exposant); // récupère le premier chiffre
-        --exposant;
     }
 
-    return exposant;
+    return ++exposant; // rajoute 1, car la dernière décrémentation est de trop
 }
 
 string montantEnToutesLettres(long double montant) {
@@ -38,6 +35,7 @@ string montantEnToutesLettres(long double montant) {
         return "Erreur, entrez un nombre compris entre 0 compris et 10 puissance 12 non compris";
     } else {
         exposant_actuel = premier(montant, exposant_actuel);
+        cout << "Miaow -> " << exposant_actuel << endl;
 
         while (exposant_actuel >= -2) {
             cout << unite(montant_temp, exposant_actuel) << " - " << exposant_actuel << " - " << montant_temp << endl;
