@@ -1,3 +1,11 @@
+/* ---------------------------
+Laboratoire : 01-MontantEnToutesLettres
+Auteur(s) : David Schildböck
+Date : 06.10.2023
+But : convertisseur nombre mathématique au langage français
+Remarque(s) :   - pas de tableaux, pas de redondance de code, pas de plagiat
+                - règles du français respectées
+--------------------------- */
 #include "montantEnToutesLettres.h"
 #include <iostream>
 #include <cmath>
@@ -5,7 +13,7 @@
 using namespace std;
 
 // fonction pour afficher chaque chiffre du nombre donné par le user
-int unite(long double& n, int& exposant){
+int unite(long double& n, int exposant){
     int chiffre;
 
     chiffre = trunc(n / pow(10, exposant)); // ajoute le chiffre en arrondissant à la valeur inférieure (4.6 = 4) / ! il y a une conversion de type long double à int voulu !
@@ -24,23 +32,181 @@ int premier(long double n, int exposant){
     return ++exposant; // rajoute 1, car la dernière décrémentation est de trop
 }
 
+int category(int exposant, string& NomCat){
+    int cat;
+
+    switch (exposant) {
+        case 11:;
+        case 10:;
+        case 9: cat = 9;
+            NomCat = "milliard";
+            break;
+        case 8:;
+        case 7:;
+        case 6: cat = 6;
+            NomCat = "million";
+            break;
+        case 5:;
+        case 4:;
+        case 3: cat = 3;
+            NomCat = "mille";
+            break;
+        case 2:;
+        case 1:;
+        case 0: cat = 0;
+            NomCat = "";
+            break;
+        case -1:;
+        case -2: cat = -2;
+            NomCat = "centimes";
+            break;
+        default: cout << "\n-> Erreur_fonction_category..." << endl;
+    }
+    return cat;
+}
+
+int Decomposition(long double& n, int exposant_start, string& NomCat){
+
+    int chiffre = 0;
+    int exposant_reste = 0;
+    int cat = 0;
+    exposant_start = premier(n, exposant_start);
+    cat = category(exposant_start, NomCat);
+    exposant_reste = exposant_start - cat;
+
+    while (exposant_start >= cat) {
+
+        chiffre += unite(n, exposant_start) * pow(10,exposant_reste);
+
+        exposant_reste--;
+        exposant_start--;
+    }
+    return chiffre;
+}
+
+string conversion_unite(int chiffre){
+    string mot = "";
+
+    switch (chiffre) {
+        case 2: mot = "deux"; break;
+        case 3: mot = "trois"; break;
+        case 4: mot = "quatre"; break;
+        case 5: mot = "cinq"; break;
+        case 6: mot = "six"; break;
+        case 7: mot = "sept"; break;
+        case 8: mot = "huit"; break;
+        case 9: mot = "neuf"; break;
+    }
+    return mot;
+}
+
+string conversion_dizaine(int chiffre){
+    string mot = "";
+
+    switch (chiffre) {
+        case 2: mot = "vingt"; break;
+        case 3: mot = "trente"; break;
+        case 4: mot = "quarante"; break;
+        case 5: mot = "cinquante"; break;
+        case 6: mot = "soixante"; break;
+        case 7: mot = "septante"; break;
+        case 8: mot = "huitante"; break;
+        case 9: mot = "nonante"; break;
+    }
+    return mot;
+}
+
+string conversion_special(long double nombre){
+    string mot = "";
+    int n;
+    n = trunc(nombre);
+
+    switch (n) {
+        case 10: mot = "dix"; break;
+        case 11: mot = "onze"; break;
+        case 12: mot = "douze"; break;
+        case 13: mot = "treize"; break;
+        case 14: mot = "quatorze"; break;
+        case 15: mot = "quinze"; break;
+        case 16: mot = "seize"; break;
+        case 17: mot = "dix-sept"; break;
+        case 18: mot = "dix-huit"; break;
+        case 19: mot = "dix-neuf"; break;
+    }
+    return mot;
+}
+
+string conversion_2chiffres(long double nombre){
+    string result = "";
+    int chiffre1 = 0;
+    int chiffre0 = 0;
+    long double nombre_temp = nombre;
+    chiffre1 = unite(nombre_temp, 1);
+    chiffre0 = unite(nombre_temp, 0);
+
+    if (chiffre1 >= 2){
+        if (chiffre0 != 1){
+            result = conversion_dizaine(chiffre1) + "-" + conversion_unite(chiffre0);
+        } else {
+            result = conversion_dizaine(chiffre1) + " et un";
+        }
+    } else if (chiffre1 == 1){
+        result = conversion_special(nombre);
+    } else{
+        result = conversion_unite(chiffre0);
+    }
+    return result;
+}
+
+string conversion(long double n, int exposant){
+    long double reste;
+    long double check = 0;
+    long double check_temp;
+    string nom_cat = "";
+    string result = "";
+    string result_temp = "";
+    int chiffre2 = 0;
+
+    while (n > 0.){
+        check = Decomposition(n, exposant, nom_cat);
+        check_temp = check;
+        chiffre2 = unite(check_temp, 2);
+
+        if (chiffre2 > 1 and check_temp != 0){
+            result_temp = conversion_unite(chiffre2) + " cents ";
+            check -= chiffre2 * pow(10, 2);
+
+        } else if (chiffre2 == 1 or check_temp == 0) {
+            result_temp = conversion_2chiffres(chiffre2) + " cent ";
+            check -= chiffre2 * pow(10, 2);
+        }
+
+        if (check != 0){
+            result_temp += conversion_2chiffres(check);
+        }
+
+        if (nom_cat != "" and nom_cat != "mille" and nom_cat != "centimes"){
+            result += result_temp + " " + nom_cat + "s ";
+        } else{
+            result += result_temp + " " + nom_cat + " ";
+        }
+    }
+    return result;
+}
+
 string montantEnToutesLettres(long double montant) {
     const double montant_trop_grand = 1000000000000.;
     const double montant_trop_petit = 0.;
     int exposant_actuel = 11;
     long double montant_temp = montant;
+    string nom_cat = " ";
 
     // check la valeur entrée par l'utilisateur
     if (montant < montant_trop_petit or montant > montant_trop_grand){
         return "Erreur, entrez un nombre compris entre 0 compris et 10 puissance 12 non compris";
     } else {
-        exposant_actuel = premier(montant, exposant_actuel);
-        cout << "Miaow -> " << exposant_actuel << endl;
-
-        while (exposant_actuel >= -2) {
-            cout << unite(montant_temp, exposant_actuel) << " - " << exposant_actuel << " - " << montant_temp << endl;
-            exposant_actuel--;
-        }
-        return "zero franc"s;
+        //cout << "TEST -- D -> " << Decomposition(montant_temp, exposant_actuel, nom_cat) << " - M-> " << montant_temp  << " - C -> " << nom_cat << endl;
+        cout << "TEST -->" << conversion(montant_temp, exposant_actuel) << endl;
+        return "francs"s;
     }
 }
