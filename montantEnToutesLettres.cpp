@@ -14,12 +14,14 @@ using namespace std;
 
 // fonction pour afficher chaque chiffre du nombre donné par le user
 int unite(long double& n, int exposant){
-    int chiffre;
+    int chiffre = 0;
+    long double test = 0;
+    long double test2 = 0;
 
     if (exposant > -2){
         chiffre = trunc(n / pow(10, exposant)); // ajoute le chiffre en arrondissant à la valeur inférieure (4.6 = 4) / ! il y a une conversion de type long double à int voulu !
     } else {
-        chiffre = trunc(n / pow(10, exposant) + 1);
+        chiffre = round(n*100);
     }
     n -= chiffre * pow(10, exposant); // change la valeur du nombre sans le chiffre trouvé avant
 
@@ -148,9 +150,11 @@ string conversion_2chiffres(long double nombre){
     chiffre1 = unite(nombre_temp, 1);
     chiffre0 = unite(nombre_temp, 0);
 
-    if (chiffre1 >= 2){
-        if (chiffre0 != 1){
+    if (chiffre1 >= 2) {
+        if (chiffre0 != 1 and chiffre0 != 0) {
             result = conversion_dizaine(chiffre1) + "-" + conversion_unite(chiffre0);
+        } else if (chiffre0 != 1 and chiffre0 == 0) {
+            result = conversion_dizaine(chiffre1);
         } else {
             result = conversion_dizaine(chiffre1) + " et un";
         }
@@ -171,30 +175,31 @@ string conversion(long double n, int exposant){
     string result_temp = "";
     int chiffre2 = 0;
     int chiffre0 = 0;
+    long double n_temp = n;
 
-    while (n > 0.){
+    while (ceil(n) > 0.){
         check = Decomposition(n, exposant, nom_cat);
         check_temp = check;
         chiffre2 = unite(check_temp, 2);
         chiffre0 = unite(check_temp, 0);
 
-        if (nom_cat == "centimes"){
-            result_temp = " et ";
+        if (nom_cat == "centimes" and n_temp < 1){
+            result_temp = "";
+        } else if (nom_cat == "centimes" and round(n_temp) >= 1){
+            result_temp = "Y et ";
         }
 
         if (chiffre2 > 1 and check_temp == 0 and n == 0){
-            result_temp = conversion_unite(chiffre2) + " cents ";
+            result_temp = conversion_unite(chiffre2) + "-cents-";
             check -= chiffre2 * pow(10, 2);
 
         } else if (chiffre2 > 1 or check_temp != 0 and n != 0) {
-            result_temp += result_temp + conversion_2chiffres(chiffre2) + " cent ";
+            result_temp += result_temp + conversion_2chiffres(chiffre2) + "-cent-";
             check -= chiffre2 * pow(10, 2);
         } else if (chiffre2 == 1 or check_temp != 0 and n != 0) {
-            result_temp += result_temp + "cent ";
+            result_temp += result_temp + "cent-";
             check -= chiffre2 * pow(10, 2);
         }
-
-        cout << "TEST>" << check << "<>" << chiffre2 << endl;
 
         if (check != 0){
             result_temp += conversion_2chiffres(check);
@@ -202,22 +207,24 @@ string conversion(long double n, int exposant){
 
         if (nom_cat == "million" or nom_cat == "milliard"){
             if (chiffre0 == 1){
-                result += result_temp + "un " + nom_cat + " ";
+                result += result_temp + "un-" + nom_cat + "-";
             } else {
-                result += result_temp + " " + nom_cat + "s ";
+                result += result_temp + "-" + nom_cat + "s-";
             }
-        } else if (nom_cat == ""){
+        } else if (nom_cat == "" or nom_cat == "centimes"){
             result += result_temp + " " + nom_cat;
         } else{
-            result += result_temp + " " + nom_cat + " ";
+            result += result_temp + "-" + nom_cat + "-";
         }
 
-        if (nom_cat == ""){
+        /*if (nom_cat == "" and exposant == 0){
             switch (chiffre0) {
-                case 0:;
-                case 1: result += "franc"; break;
-                default: result += "francs";
+                case 0: result = "zero franc"; break;
+                case 1: result += "un franc";
             }
+        }*/
+        if (nom_cat == ""){
+            result += "francs";
         }
         result_temp = "";
     }
@@ -235,8 +242,11 @@ string montantEnToutesLettres(long double montant) {
     if (montant < montant_trop_petit or montant > montant_trop_grand){
         return "Erreur, entrez un nombre compris entre 0 compris et 10 puissance 12 non compris";
     } else {
-        //cout << "TEST -- D -> " << Decomposition(montant_temp, exposant_actuel, nom_cat) << " - M-> " << montant_temp  << " - C -> " << nom_cat << endl;
-        cout << "TEST -->" << conversion(montant_temp, exposant_actuel) << endl;
-        return "..."s;
+
+        if (conversion(montant_temp, exposant_actuel).empty()){
+            return "zero franc";
+        } else {
+            return conversion(montant_temp, exposant_actuel);
+        }
     }
 }
