@@ -16,7 +16,11 @@ using namespace std;
 int unite(long double& n, int exposant){
     int chiffre;
 
-    chiffre = trunc(n / pow(10, exposant)); // ajoute le chiffre en arrondissant à la valeur inférieure (4.6 = 4) / ! il y a une conversion de type long double à int voulu !
+    if (exposant > -2){
+        chiffre = trunc(n / pow(10, exposant)); // ajoute le chiffre en arrondissant à la valeur inférieure (4.6 = 4) / ! il y a une conversion de type long double à int voulu !
+    } else {
+        chiffre = trunc(n / pow(10, exposant) + 1);
+    }
     n -= chiffre * pow(10, exposant); // change la valeur du nombre sans le chiffre trouvé avant
 
     return chiffre;
@@ -78,8 +82,8 @@ int Decomposition(long double& n, int exposant_start, string& NomCat){
 
         chiffre += unite(n, exposant_start) * pow(10,exposant_reste);
 
-        exposant_reste--;
         exposant_start--;
+        exposant_reste--;
     }
     return chiffre;
 }
@@ -166,30 +170,56 @@ string conversion(long double n, int exposant){
     string result = "";
     string result_temp = "";
     int chiffre2 = 0;
+    int chiffre0 = 0;
 
     while (n > 0.){
         check = Decomposition(n, exposant, nom_cat);
         check_temp = check;
         chiffre2 = unite(check_temp, 2);
+        chiffre0 = unite(check_temp, 0);
 
-        if (chiffre2 > 1 and check_temp != 0){
+        if (nom_cat == "centimes"){
+            result_temp = " et ";
+        }
+
+        if (chiffre2 > 1 and check_temp == 0 and n == 0){
             result_temp = conversion_unite(chiffre2) + " cents ";
             check -= chiffre2 * pow(10, 2);
 
-        } else if (chiffre2 == 1 or check_temp == 0) {
-            result_temp = conversion_2chiffres(chiffre2) + " cent ";
+        } else if (chiffre2 > 1 or check_temp != 0 and n != 0) {
+            result_temp += result_temp + conversion_2chiffres(chiffre2) + " cent ";
+            check -= chiffre2 * pow(10, 2);
+        } else if (chiffre2 == 1 or check_temp != 0 and n != 0) {
+            result_temp += result_temp + "cent ";
             check -= chiffre2 * pow(10, 2);
         }
+
+        cout << "TEST>" << check << "<>" << chiffre2 << endl;
 
         if (check != 0){
             result_temp += conversion_2chiffres(check);
         }
 
-        if (nom_cat != "" and nom_cat != "mille" and nom_cat != "centimes"){
-            result += result_temp + " " + nom_cat + "s ";
+        if (nom_cat == "million" or nom_cat == "milliard"){
+            if (chiffre0 == 1){
+                result += result_temp + "un " + nom_cat + " ";
+            } else {
+                result += result_temp + " " + nom_cat + "s ";
+            }
+        } else if (nom_cat == ""){
+            result += result_temp + " " + nom_cat;
         } else{
             result += result_temp + " " + nom_cat + " ";
         }
+
+        if (nom_cat == ""){
+            switch (chiffre0) {
+                case 0:;
+                case 1: result += "franc"; break;
+                default: result += "francs";
+            }
+        }
+        result_temp = "";
     }
     return result;
 }
@@ -207,6 +237,6 @@ string montantEnToutesLettres(long double montant) {
     } else {
         //cout << "TEST -- D -> " << Decomposition(montant_temp, exposant_actuel, nom_cat) << " - M-> " << montant_temp  << " - C -> " << nom_cat << endl;
         cout << "TEST -->" << conversion(montant_temp, exposant_actuel) << endl;
-        return "francs"s;
+        return "..."s;
     }
 }
