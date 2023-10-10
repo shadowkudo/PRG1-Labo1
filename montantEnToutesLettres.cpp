@@ -231,7 +231,7 @@ string conversion(long double n, int exposant){
     return result;
 }
 
-string montantEnToutesLettres(long double montant) {
+string montantEnToutesLettresOLDVERSION(long double montant) {
     const double montant_trop_grand = 1000000000000.;
     const double montant_trop_petit = 0.;
     int exposant_actuel = 11;
