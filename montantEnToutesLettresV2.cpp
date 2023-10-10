@@ -89,7 +89,7 @@ int DecompositionMontantCategory(long long& Entier, int ExposantCategory){
 }
 
 string ConversionUnite(int Chiffre){
-    string Conversion = "";
+    string Conversion;
 
     switch (Chiffre) {
         case 2: Conversion = "deux"; break;
@@ -105,7 +105,7 @@ string ConversionUnite(int Chiffre){
 }
 
 string ConversionDizaine(int Chiffre){
-    string Conversion = "";
+    string Conversion;
 
     switch (Chiffre) {
         case 1: Conversion = "dix"; break;
@@ -122,9 +122,10 @@ string ConversionDizaine(int Chiffre){
 }
 
 string ConversionSpecial(int Nombre){
-    string Conversion = "";
+    string Conversion;
 
     switch (Nombre) {
+        case 10: Conversion = "dix"; break;
         case 11: Conversion = "onze"; break;
         case 12: Conversion = "douze"; break;
         case 13: Conversion = "treize"; break;
@@ -141,7 +142,7 @@ string ConversionSpecial(int Nombre){
 string ConverionDeuxChiffres(int Chiffre1, int Chiffre0, int Nombre){
     string Conversion;
 
-    if (Nombre < 20 and Nombre > 10){
+    if (Nombre < 20 and Nombre >= 10){
         Conversion = ConversionSpecial(Nombre);
     } else if (Chiffre1 > 1){
         switch (Chiffre0) {
@@ -168,10 +169,13 @@ string ConversionCentaine(int TroisChiffes, long long EntierReste){
         } else if (Chiffre2 == 1 and EntierReste2Chiffre > 1){
             Centaine = "cent-" + ConverionDeuxChiffres(Chiffre1, Chiffre0, EntierReste2Chiffre);
 
+        } else if (Chiffre2 == 1 and EntierReste2Chiffre == 1) {
+            Centaine = "cent-un";
+
         } else if (Chiffre2 > 1 and EntierReste2Chiffre == 0){
             Centaine = ConversionUnite(Chiffre2) + "-cent";
 
-        } else if (Chiffre2 > 1 and EntierReste2Chiffre > 1){
+        } else if (Chiffre2 > 1 and EntierReste2Chiffre > 0){
             Centaine = ConversionUnite(Chiffre2) + "-cent-" + ConverionDeuxChiffres(Chiffre1, Chiffre0, EntierReste2Chiffre);
 
         } else{
