@@ -191,9 +191,9 @@ string Conversion(int Centaine, int Categorie, long long Reste){
 
     switch (Categorie) {
         case 9:
-            Conversion = (Centaine > 1 ? ConvertiCentaine + "-" : (Centaine == 1 ? "un-" : "")) + "milliard" + (Centaine > 1 ? "s" : "") + (Reste > 0 ? "-" : ""); break;
+            Conversion = (Centaine > 1 ? ConvertiCentaine + "-" : (Centaine == 1 ? "un-" : "")) + "milliard" + (Centaine > 1 ? "s" : "") + (Reste > 0 ? "-" : " de francs")/* + (Reste == 1 ? "et-" : "")*/; break;
         case 6:
-            Conversion += (Centaine > 1 ? ConvertiCentaine + "-" : (Centaine == 1 ? "un-" : "")) + "million" + (Centaine > 1 ? "s" : "") + (Reste > 0 ? "-" : ""); break;
+            Conversion += (Centaine > 1 ? ConvertiCentaine + "-" : (Centaine == 1 ? "un-" : "")) + "million" + (Centaine > 1 ? "s" : "") + (Reste > 0 ? "-" : " de francs")/* + (Reste == 1 ? "et-" : "")*/; break;
         case 3:
             Conversion += (Centaine > 1 ? ConvertiCentaine + "-" : "") + "mille" + (Reste > 0 ? "-" : ""); break;
         case 0:
