@@ -164,6 +164,9 @@ string ConversionCentaine(int TroisChiffes, long long EntierReste){
         } else if (Chiffre2 == 1 and EntierReste2Chiffre == 1) {
             Centaine = "cent-un";
 
+        } else if (Chiffre2 == 1 and EntierReste2Chiffre == 0) {
+            Centaine = "cent";
+
         } else if (Chiffre2 > 1 and EntierReste2Chiffre == 0){
             Centaine = ConversionNormale(Chiffre2) + "-cent";
 
@@ -187,7 +190,7 @@ string Conversion(int Centaine, int Categorie, long long Reste){
         case 6:
             Conversion += (Centaine > 1 ? ConvertiCentaine + "-" : (Centaine == 1 ? "un-" : "")) + "million" + (Centaine > 1 ? "s" : "") + (Reste > 0 ? "-" : " de francs")/* + (Reste == 1 ? "et-" : "")*/; break;
         case 3:
-            Conversion += (Centaine > 1 ? ConvertiCentaine + "-" : "") + "mille" + (Reste > 0 ? "-" : ""); break;
+            Conversion += (Centaine > 1 ? ConvertiCentaine + "-" : "") + "mille" + (Reste > 0 ? "-" : " francs"); break;
         case 0:
             Conversion += (Centaine > 1 ? ConvertiCentaine + " " : (Centaine == 1 ? "un " : "zero ")) + "franc" + (Centaine > 1 ? "s" : ""); break;
         case -2:
@@ -205,8 +208,10 @@ string montantEnToutesLettres(long double montant) {
     int Decimales = 0;
 
     // check la valeur entrée par l'utilisateur
-    if (montant < MontantTropPetit or montant > MontantTropGrand){
-        return "Erreur, entrez un nombre compris entre 0 compris et 10 puissance 12 non compris";
+    if (montant < MontantTropPetit){
+        return "erreur : montant negatif";
+    } else if (montant >= MontantTropGrand){
+        return  "erreur : montant trop grand";
     } else {
 
         Decimales = ArrondirDecimales(montant, Entier);
