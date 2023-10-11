@@ -1,6 +1,6 @@
 /* ---------------------------
 Laboratoire : 01-MontantEnToutesLettres
-Auteur(s) : David Schildböck
+Auteur(s) : David Schildböck - Agron Markaj
 Date : 06.10.2023
 But : convertisseur nombre mathématique au langage français
 Remarque(s) :   - pas de tableaux, pas de redondance de code, pas de plagiat
