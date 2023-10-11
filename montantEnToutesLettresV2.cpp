@@ -19,13 +19,13 @@ int PremierExposant(long long Nombre){
 }
 
 // fonction pour trouver le chiffre d'un nombre donné selon son exposant (0 -> unité, 1 -> dizaine, ...)
-int PremierChiffre(long double Nombre, int ChercheExposant){
+int PremierChiffre(long long Nombre, int ChercheExposant){
     int ChiffreTrouve = 0;
     int ExposantStart = PremierExposant(Nombre);
 
     for (; ExposantStart >= ChercheExposant; ExposantStart--) {
-        ChiffreTrouve = static_cast<int>(trunc(Nombre / pow(10, ExposantStart)));
-        Nombre -= ChiffreTrouve * pow(10, ExposantStart);
+        ChiffreTrouve = static_cast<int>(trunc(static_cast<long double>(Nombre) / pow(10, ExposantStart)));
+        Nombre -= static_cast<long long>(ChiffreTrouve * pow(10, ExposantStart));
     }
     return ChiffreTrouve;
 }
@@ -88,7 +88,33 @@ int DecompositionMontantCategory(long long& Entier, int ExposantCategory){
     return Decomposition;
 }
 
-string ConversionUnite(int Chiffre){
+string ConversionNormale(int Nombre){
+    string Conversion;
+
+    switch (Nombre) {
+        case 2: Conversion = "deux"; break;
+        case 3: Conversion = "trois"; break;
+        case 4: Conversion = "quatre"; break;
+        case 5: Conversion = "cinq"; break;
+        case 6: Conversion = "six"; break;
+        case 7: Conversion = "sept"; break;
+        case 8: Conversion = "huit"; break;
+        case 9: Conversion = "neuf"; break;
+        case 10: Conversion = "dix"; break;
+        case 11: Conversion = "onze"; break;
+        case 12: Conversion = "douze"; break;
+        case 13: Conversion = "treize"; break;
+        case 14: Conversion = "quatorze"; break;
+        case 15: Conversion = "quinze"; break;
+        case 16: Conversion = "seize"; break;
+        case 17: Conversion = "dix-sept"; break;
+        case 18: Conversion = "dix-huite"; break;
+        case 19: Conversion = "dix-neuf"; break;
+    }
+    return Conversion;
+}
+
+/*string ConversionUnite(int Chiffre){
     string Conversion;
 
     switch (Chiffre) {
@@ -102,7 +128,7 @@ string ConversionUnite(int Chiffre){
         case 9: Conversion = "neuf"; break;
     }
     return Conversion;
-}
+}*/
 
 string ConversionDizaine(int Chiffre){
     string Conversion;
@@ -121,7 +147,7 @@ string ConversionDizaine(int Chiffre){
     return Conversion;
 }
 
-string ConversionSpecial(int Nombre){
+/*string ConversionSpecial(int Nombre){
     string Conversion;
 
     switch (Nombre) {
@@ -137,21 +163,21 @@ string ConversionSpecial(int Nombre){
         case 19: Conversion = "dix-neuf"; break;
     }
     return Conversion;
-}
+}*/
 
-string ConverionDeuxChiffres(int Chiffre1, int Chiffre0, int Nombre){
+string ConversionDeuxChiffres(int Chiffre1, int Chiffre0, int Nombre){
     string Conversion;
 
     if (Nombre < 20 and Nombre >= 10){
-        Conversion = ConversionSpecial(Nombre);
+        Conversion = ConversionNormale(Nombre);
     } else if (Chiffre1 > 1){
         switch (Chiffre0) {
             case 0: Conversion = ConversionDizaine(Chiffre1); break;
             case 1: Conversion = ConversionDizaine(Chiffre1) + "-et-un"; break;
-            default: Conversion = ConversionDizaine(Chiffre1) + "-" + ConversionUnite(Chiffre0);
+            default: Conversion = ConversionDizaine(Chiffre1) + "-" + ConversionNormale(Chiffre0);
         }
     } else if (Nombre < 10){
-        Conversion = ConversionUnite(Chiffre0);
+        Conversion = ConversionNormale(Chiffre0);
     }
     return  Conversion;
 }
@@ -164,22 +190,22 @@ string ConversionCentaine(int TroisChiffes, long long EntierReste){
 
     if (TroisChiffes != 0){
         if (Chiffre2 > 1 and EntierReste2Chiffre == 0 and EntierReste == 0){
-            Centaine = ConversionUnite(Chiffre2) + "-cents";
+            Centaine = ConversionNormale(Chiffre2) + "-cents";
 
         } else if (Chiffre2 == 1 and EntierReste2Chiffre > 1){
-            Centaine = "cent-" + ConverionDeuxChiffres(Chiffre1, Chiffre0, EntierReste2Chiffre);
+            Centaine = "cent-" + ConversionDeuxChiffres(Chiffre1, Chiffre0, EntierReste2Chiffre);
 
         } else if (Chiffre2 == 1 and EntierReste2Chiffre == 1) {
             Centaine = "cent-un";
 
         } else if (Chiffre2 > 1 and EntierReste2Chiffre == 0){
-            Centaine = ConversionUnite(Chiffre2) + "-cent";
+            Centaine = ConversionNormale(Chiffre2) + "-cent";
 
         } else if (Chiffre2 > 1 and EntierReste2Chiffre > 0){
-            Centaine = ConversionUnite(Chiffre2) + "-cent-" + ConverionDeuxChiffres(Chiffre1, Chiffre0, EntierReste2Chiffre);
+            Centaine = ConversionNormale(Chiffre2) + "-cent-" + ConversionDeuxChiffres(Chiffre1, Chiffre0, EntierReste2Chiffre);
 
         } else{
-            Centaine = ConverionDeuxChiffres(Chiffre1, Chiffre0, EntierReste2Chiffre);
+            Centaine = ConversionDeuxChiffres(Chiffre1, Chiffre0, EntierReste2Chiffre);
         }
     }
     return Centaine;
