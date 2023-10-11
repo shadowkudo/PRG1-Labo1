@@ -14,8 +14,8 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(tests tests_labo1.cpp montantEnToutesLettres.cpp)
+add_executable(tests tests_labo1.cpp)
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 
-add_executable(Labo1 main.cpp montantEnToutesLettres.cpp
-        montantEnToutesLettresV2.cpp)
+add_executable(Labo1 main.cpp
+        montantEnToutesLettres.cpp)

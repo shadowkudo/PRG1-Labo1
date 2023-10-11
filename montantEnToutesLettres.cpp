@@ -6,247 +6,272 @@ But : convertisseur nombre mathématique au langage français
 Remarque(s) :   - pas de tableaux, pas de redondance de code, pas de plagiat
                 - règles du français respectées
 --------------------------- */
-#include "montantEnToutesLettres.h"
 #include <iostream>
 #include <cmath>
 
 using namespace std;
 
-// fonction pour afficher chaque chiffre du nombre donné par le user
-int unite(long double& n, int exposant){
-    int chiffre = 0;
-    long double test = 0;
-    long double test2 = 0;
+// fonction pour trouver le premier exposant dont le chiffre est différent de 1 (4320 -> chiffre 4 -> exposant 3)
+int PremierExposant(long long Nombre){
+    auto ExposantStart = static_cast<int>(floor(log10(Nombre)));
 
-    if (exposant > -2){
-        chiffre = trunc(n / pow(10, exposant)); // ajoute le chiffre en arrondissant à la valeur inférieure (4.6 = 4) / ! il y a une conversion de type long double à int voulu !
-    } else {
-        chiffre = round(n*100);
-    }
-    n -= chiffre * pow(10, exposant); // change la valeur du nombre sans le chiffre trouvé avant
-
-    return chiffre;
+    return ExposantStart;
 }
 
-// fonction pour trouver le premier chiffre qui ne vaut pas 0
-int premier(long double n, int exposant){
-    // on cherche la valeur > 0
-    for (int first = 0; first < 1; exposant--) {
-        first = unite(n,exposant); // récupère le premier chiffre
-    }
+// fonction pour trouver le chiffre d'un nombre donné selon son exposant (0 -> unité, 1 -> dizaine, ...)
+int PremierChiffre(long long Nombre, int ChercheExposant){
+    int ChiffreTrouve = 0;
+    int ExposantStart = PremierExposant(Nombre);
 
-    return ++exposant; // rajoute 1, car la dernière décrémentation est de trop
+    for (; ExposantStart >= ChercheExposant; ExposantStart--) {
+        ChiffreTrouve = static_cast<int>(trunc(static_cast<long double>(Nombre) / pow(10, ExposantStart)));
+        Nombre -= static_cast<long long>(ChiffreTrouve * pow(10, ExposantStart));
+    }
+    return ChiffreTrouve;
 }
 
-int category(int exposant, string& NomCat){
-    int cat;
+// fonction pour séparer l'entier (à gauche de la virgule) et les décimales (à droite de la virgule)
+// pour arrondir les décimales et ajouter un à l'entier quand D > 99
+int ArrondirDecimales(long double Montant, long long& Entier){
 
-    switch (exposant) {
+    Entier = static_cast<long long>(Montant);
+    auto Decimales = static_cast<int>(round((Montant - Entier)*100));
+
+    if (Decimales > 99) {
+        Entier++;
+        Decimales = 0;
+    }
+    return Decimales;
+}
+
+// fonction pour connaître la catégorie de l'exposant demandé
+int Category(int Exposant){
+    int ExposantCategory = 0;
+
+    switch (Exposant) {
         case 11:;
         case 10:;
-        case 9: cat = 9;
-            NomCat = "milliard";
+        case 9: ExposantCategory = 9;
             break;
         case 8:;
         case 7:;
-        case 6: cat = 6;
-            NomCat = "million";
+        case 6: ExposantCategory = 6;
             break;
         case 5:;
         case 4:;
-        case 3: cat = 3;
-            NomCat = "mille";
+        case 3: ExposantCategory = 3;
             break;
         case 2:;
         case 1:;
-        case 0: cat = 0;
-            NomCat = "";
+        case 0: ExposantCategory = 0;
             break;
-        case -1:;
-        case -2: cat = -2;
-            NomCat = "centimes";
-            break;
-        default: cout << "\n-> Erreur_fonction_category..." << endl;
     }
-    return cat;
+    return ExposantCategory;
 }
 
-int Decomposition(long double& n, int exposant_start, string& NomCat){
+// fonction pour décomposer l'entier en différentes catégories (milliard, millier, ...)
+int DecompositionMontantCategory(long long& Entier, int ExposantCategory){
+    int Decomposition = 0;
+    int ExposantStart = 0;
+    int ExposantReste = 0;
+    ExposantStart = PremierExposant(Entier);
+    ExposantReste = ExposantStart - ExposantCategory;
 
-    int chiffre = 0;
-    int exposant_reste = 0;
-    int cat = 0;
-    exposant_start = premier(n, exposant_start);
-    cat = category(exposant_start, NomCat);
-    exposant_reste = exposant_start - cat;
+    for (; ExposantStart >= ExposantCategory; ExposantStart--) {
 
-    while (exposant_start >= cat) {
+        auto NbTemp = static_cast<long long>(floor(static_cast<long double>(Entier) / pow(10, ExposantStart)));
+        Entier -= static_cast<long long>(static_cast<long double>(NbTemp) * pow(10, ExposantStart));
+        Decomposition += static_cast<int>(static_cast<long double>(NbTemp) * pow(10, ExposantReste));
+        ExposantReste--;
 
-        chiffre += unite(n, exposant_start) * pow(10,exposant_reste);
-
-        exposant_start--;
-        exposant_reste--;
     }
-    return chiffre;
+    return Decomposition;
 }
 
-string conversion_unite(int chiffre){
-    string mot = "";
+string ConversionNormale(int Nombre){
+    string Conversion;
 
-    switch (chiffre) {
-        case 2: mot = "deux"; break;
-        case 3: mot = "trois"; break;
-        case 4: mot = "quatre"; break;
-        case 5: mot = "cinq"; break;
-        case 6: mot = "six"; break;
-        case 7: mot = "sept"; break;
-        case 8: mot = "huit"; break;
-        case 9: mot = "neuf"; break;
+    switch (Nombre) {
+        case 2: Conversion = "deux"; break;
+        case 3: Conversion = "trois"; break;
+        case 4: Conversion = "quatre"; break;
+        case 5: Conversion = "cinq"; break;
+        case 6: Conversion = "six"; break;
+        case 7: Conversion = "sept"; break;
+        case 8: Conversion = "huit"; break;
+        case 9: Conversion = "neuf"; break;
+        case 10: Conversion = "dix"; break;
+        case 11: Conversion = "onze"; break;
+        case 12: Conversion = "douze"; break;
+        case 13: Conversion = "treize"; break;
+        case 14: Conversion = "quatorze"; break;
+        case 15: Conversion = "quinze"; break;
+        case 16: Conversion = "seize"; break;
+        case 17: Conversion = "dix-sept"; break;
+        case 18: Conversion = "dix-huite"; break;
+        case 19: Conversion = "dix-neuf"; break;
     }
-    return mot;
+    return Conversion;
 }
 
-string conversion_dizaine(int chiffre){
-    string mot = "";
+/*string ConversionUnite(int Chiffre){
+    string Conversion;
 
-    switch (chiffre) {
-        case 2: mot = "vingt"; break;
-        case 3: mot = "trente"; break;
-        case 4: mot = "quarante"; break;
-        case 5: mot = "cinquante"; break;
-        case 6: mot = "soixante"; break;
-        case 7: mot = "septante"; break;
-        case 8: mot = "huitante"; break;
-        case 9: mot = "nonante"; break;
+    switch (Chiffre) {
+        case 2: Conversion = "deux"; break;
+        case 3: Conversion = "trois"; break;
+        case 4: Conversion = "quatre"; break;
+        case 5: Conversion = "cinq"; break;
+        case 6: Conversion = "six"; break;
+        case 7: Conversion = "sept"; break;
+        case 8: Conversion = "huit"; break;
+        case 9: Conversion = "neuf"; break;
     }
-    return mot;
+    return Conversion;
+}*/
+
+string ConversionDizaine(int Chiffre){
+    string Conversion;
+
+    switch (Chiffre) {
+        case 1: Conversion = "dix"; break;
+        case 2: Conversion = "vingt"; break;
+        case 3: Conversion = "trente"; break;
+        case 4: Conversion = "quarante"; break;
+        case 5: Conversion = "cinquante"; break;
+        case 6: Conversion = "soixante"; break;
+        case 7: Conversion = "septante"; break;
+        case 8: Conversion = "huitante"; break;
+        case 9: Conversion = "nonante"; break;
+    }
+    return Conversion;
 }
 
-string conversion_special(long double nombre){
-    string mot = "";
-    int n;
-    n = trunc(nombre);
+/*string ConversionSpecial(int Nombre){
+    string Conversion;
 
-    switch (n) {
-        case 10: mot = "dix"; break;
-        case 11: mot = "onze"; break;
-        case 12: mot = "douze"; break;
-        case 13: mot = "treize"; break;
-        case 14: mot = "quatorze"; break;
-        case 15: mot = "quinze"; break;
-        case 16: mot = "seize"; break;
-        case 17: mot = "dix-sept"; break;
-        case 18: mot = "dix-huit"; break;
-        case 19: mot = "dix-neuf"; break;
+    switch (Nombre) {
+        case 10: Conversion = "dix"; break;
+        case 11: Conversion = "onze"; break;
+        case 12: Conversion = "douze"; break;
+        case 13: Conversion = "treize"; break;
+        case 14: Conversion = "quatorze"; break;
+        case 15: Conversion = "quinze"; break;
+        case 16: Conversion = "seize"; break;
+        case 17: Conversion = "dix-sept"; break;
+        case 18: Conversion = "dix-huite"; break;
+        case 19: Conversion = "dix-neuf"; break;
     }
-    return mot;
-}
+    return Conversion;
+}*/
 
-string conversion_2chiffres(long double nombre){
-    string result = "";
-    int chiffre1 = 0;
-    int chiffre0 = 0;
-    long double nombre_temp = nombre;
-    chiffre1 = unite(nombre_temp, 1);
-    chiffre0 = unite(nombre_temp, 0);
+string ConversionDeuxChiffres(int Chiffre1, int Chiffre0, int Nombre){
+    string Conversion;
 
-    if (chiffre1 >= 2) {
-        if (chiffre0 != 1 and chiffre0 != 0) {
-            result = conversion_dizaine(chiffre1) + "-" + conversion_unite(chiffre0);
-        } else if (chiffre0 != 1 and chiffre0 == 0) {
-            result = conversion_dizaine(chiffre1);
-        } else {
-            result = conversion_dizaine(chiffre1) + " et un";
+    if (Nombre < 20 and Nombre >= 10){
+        Conversion = ConversionNormale(Nombre);
+    } else if (Chiffre1 > 1){
+        switch (Chiffre0) {
+            case 0: Conversion = ConversionDizaine(Chiffre1); break;
+            case 1: Conversion = ConversionDizaine(Chiffre1) + "-et-un"; break;
+            default: Conversion = ConversionDizaine(Chiffre1) + "-" + ConversionNormale(Chiffre0);
         }
-    } else if (chiffre1 == 1){
-        result = conversion_special(nombre);
-    } else{
-        result = conversion_unite(chiffre0);
+    } else if (Nombre < 10){
+        Conversion = ConversionNormale(Chiffre0);
     }
-    return result;
+    return  Conversion;
 }
+string ConversionCentaine(int TroisChiffes, long long EntierReste){
+    string Centaine;
+    int Chiffre2 = PremierChiffre(TroisChiffes, 2);
+    int Chiffre1 = PremierChiffre(TroisChiffes, 1);
+    int Chiffre0 = PremierChiffre(TroisChiffes, 0);
+    int EntierReste2Chiffre = static_cast<int>(TroisChiffes - Chiffre2 * pow(10,2));
 
-string conversion(long double n, int exposant){
-    long double reste;
-    long double check = 0;
-    long double check_temp;
-    string nom_cat = "";
-    string result = "";
-    string result_temp = "";
-    int chiffre2 = 0;
-    int chiffre0 = 0;
-    long double n_temp = n;
+    if (TroisChiffes != 0){
+        if (Chiffre2 > 1 and EntierReste2Chiffre == 0 and EntierReste == 0){
+            Centaine = ConversionNormale(Chiffre2) + "-cents";
 
-    while (ceil(n) > 0.){
-        check = Decomposition(n, exposant, nom_cat);
-        check_temp = check;
-        chiffre2 = unite(check_temp, 2);
-        chiffre0 = unite(check_temp, 0);
+        } else if (Chiffre2 == 1 and EntierReste2Chiffre > 1){
+            Centaine = "cent-" + ConversionDeuxChiffres(Chiffre1, Chiffre0, EntierReste2Chiffre);
 
-        if (nom_cat == "centimes" and n_temp < 1){
-            result_temp = "";
-        } else if (nom_cat == "centimes" and round(n_temp) >= 1){
-            result_temp = "Y et ";
-        }
+        } else if (Chiffre2 == 1 and EntierReste2Chiffre == 1) {
+            Centaine = "cent-un";
 
-        if (chiffre2 > 1 and check_temp == 0 and n == 0){
-            result_temp = conversion_unite(chiffre2) + "-cents-";
-            check -= chiffre2 * pow(10, 2);
+        } else if (Chiffre2 > 1 and EntierReste2Chiffre == 0){
+            Centaine = ConversionNormale(Chiffre2) + "-cent";
 
-        } else if (chiffre2 > 1 or check_temp != 0 and n != 0) {
-            result_temp += result_temp + conversion_2chiffres(chiffre2) + "-cent-";
-            check -= chiffre2 * pow(10, 2);
-        } else if (chiffre2 == 1 or check_temp != 0 and n != 0) {
-            result_temp += result_temp + "cent-";
-            check -= chiffre2 * pow(10, 2);
-        }
+        } else if (Chiffre2 > 1 and EntierReste2Chiffre > 0){
+            Centaine = ConversionNormale(Chiffre2) + "-cent-" + ConversionDeuxChiffres(Chiffre1, Chiffre0, EntierReste2Chiffre);
 
-        if (check != 0){
-            result_temp += conversion_2chiffres(check);
-        }
-
-        if (nom_cat == "million" or nom_cat == "milliard"){
-            if (chiffre0 == 1){
-                result += result_temp + "un-" + nom_cat + "-";
-            } else {
-                result += result_temp + "-" + nom_cat + "s-";
-            }
-        } else if (nom_cat == "" or nom_cat == "centimes"){
-            result += result_temp + " " + nom_cat;
         } else{
-            result += result_temp + "-" + nom_cat + "-";
+            Centaine = ConversionDeuxChiffres(Chiffre1, Chiffre0, EntierReste2Chiffre);
         }
-
-        /*if (nom_cat == "" and exposant == 0){
-            switch (chiffre0) {
-                case 0: result = "zero franc"; break;
-                case 1: result += "un franc";
-            }
-        }*/
-        if (nom_cat == ""){
-            result += "francs";
-        }
-        result_temp = "";
     }
-    return result;
+    return Centaine;
 }
 
-string montantEnToutesLettresOLDVERSION(long double montant) {
-    const double montant_trop_grand = 1000000000000.;
-    const double montant_trop_petit = 0.;
-    int exposant_actuel = 11;
-    long double montant_temp = montant;
-    string nom_cat = " ";
+string Conversion(int Centaine, int Categorie, long long Reste){
+    string Conversion;
+    string ConvertiCentaine = ConversionCentaine(Centaine, Reste);
+
+    switch (Categorie) {
+        case 9:
+            Conversion = (Centaine > 1 ? ConvertiCentaine + "-" : (Centaine == 1 ? "un-" : "")) + "milliard" + (Centaine > 1 ? "s" : "") + (Reste > 0 ? "-" : " de francs")/* + (Reste == 1 ? "et-" : "")*/; break;
+        case 6:
+            Conversion += (Centaine > 1 ? ConvertiCentaine + "-" : (Centaine == 1 ? "un-" : "")) + "million" + (Centaine > 1 ? "s" : "") + (Reste > 0 ? "-" : " de francs")/* + (Reste == 1 ? "et-" : "")*/; break;
+        case 3:
+            Conversion += (Centaine > 1 ? ConvertiCentaine + "-" : "") + "mille" + (Reste > 0 ? "-" : ""); break;
+        case 0:
+            Conversion += (Centaine > 1 ? ConvertiCentaine + " " : (Centaine == 1 ? "un " : "zero ")) + "franc" + (Centaine > 1 ? "s" : ""); break;
+        case -2:
+            if (Centaine != 0){
+                Conversion += (Centaine > 1 ? ConvertiCentaine + " " : "un ") + "centime" + (Centaine > 1 ? "s" : "");
+            } break;
+    }
+    return Conversion;
+}
+
+string montantEnToutesLettres(long double montant) {
+    const double MontantTropGrand = 1000000000000.;
+    const double MontantTropPetit = 0.;
+    long long Entier = 0;
+    int Decimales = 0;
 
     // check la valeur entrée par l'utilisateur
-    if (montant < montant_trop_petit or montant > montant_trop_grand){
+    if (montant < MontantTropPetit or montant > MontantTropGrand){
         return "Erreur, entrez un nombre compris entre 0 compris et 10 puissance 12 non compris";
     } else {
 
-        if (conversion(montant_temp, exposant_actuel).empty()){
-            return "zero franc";
-        } else {
-            return conversion(montant_temp, exposant_actuel);
+        Decimales = ArrondirDecimales(montant, Entier);
+
+        long long EntierTemp = Entier;
+        string ConversionEntier;
+        string ConversionDecimale;
+        string ConversionFinale;
+        int Decomposition;
+
+        while (EntierTemp > 0) {
+            int NbCat = Category(PremierExposant(EntierTemp));
+            Decomposition = DecompositionMontantCategory(EntierTemp, NbCat);
+            ConversionEntier += Conversion(Decomposition, NbCat, EntierTemp);
         }
+
+        if (Decimales > 0){
+            ConversionDecimale += Conversion(Decimales, -2, Decimales);
+        }
+
+        if (Entier == 0 and Decimales == 0){
+            ConversionFinale = "zero franc";
+        } else if (Entier == 0 and Decimales > 0){
+            ConversionFinale = ConversionDecimale;
+        } else if (Entier > 0 and Decimales == 0) {
+            ConversionFinale = ConversionEntier;
+        } else{
+            ConversionFinale = ConversionEntier + " et " + ConversionDecimale;
+        }
+
+        cout << endl;
+        return ConversionFinale;
     }
 }
