@@ -5,6 +5,8 @@ Date : 06.10.2023
 But : convertisseur nombre mathématique au langage français
 Remarque(s) :   - pas de tableaux, pas de redondance de code, pas de plagiat
                 - règles du français respectées
+Sources utilisés :
+ - static cast -> cppreference.com
 --------------------------- */
 #include <iostream>
 #include <cmath>
@@ -88,6 +90,7 @@ int DecompositionMontantCategory(long long& Entier, int ExposantCategory){
     return Decomposition;
 }
 
+/*pseudo liste chiffres et des nombres spéciaux de 11 à 19*/
 string ConversionNormale(int Nombre){
     string Conversion;
 
