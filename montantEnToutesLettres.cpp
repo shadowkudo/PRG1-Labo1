@@ -207,14 +207,14 @@ string montantEnToutesLettres(long double montant) {
     long long Entier = 0;
     int Decimales = 0;
 
+    Decimales = ArrondirDecimales(montant, Entier);
+
     // check la valeur entrée par l'utilisateur
     if (montant < MontantTropPetit){
         return "erreur : montant negatif";
-    } else if (montant >= MontantTropGrand){
+    } else if (Entier >= MontantTropGrand){
         return  "erreur : montant trop grand";
     } else {
-
-        Decimales = ArrondirDecimales(montant, Entier);
 
         long long EntierTemp = Entier;
         string ConversionEntier;
