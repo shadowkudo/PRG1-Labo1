@@ -1,24 +1,41 @@
 /* ---------------------------
-Laboratoire : 01-MontantEnToutesLettres
-Auteur(s) : David Schildböck - Agron Markaj
-Date : 06.10.2023
-But : convertisseur nombre mathématique au langage français
+Laboratoire :   01-MontantEnToutesLettres
+Auteur(s)   :   David Schildböck - Agron Markaj
+Date        :   06.10.2023
+But         :   convertisseur nombre mathématique au langage français
 Remarque(s) :   - pas de tableaux, pas de redondance de code, pas de plagiat
-                - règles du français respectées
+                - règles du Français respectées selon https://www.dictionnaire-academie.fr/article/QDL057
+                - arrondi 0.995 à 1.00
+Source(s)   :   - static_cast   ->  https://en.cppreference.com/w/cpp/language/static_cast
+                - floor()       ->  https://en.cppreference.com/w/cpp/numeric/math/floor
+                - round()       ->  https://en.cppreference.com/w/cpp/numeric/math/round
+                - trunc()       ->  https://en.cppreference.com/w/cpp/numeric/math/trunc
 --------------------------- */
 #include <iostream>
 #include <cmath>
 
 using namespace std;
 
-// fonction pour trouver le premier exposant dont le chiffre est différent de 1 (4320 -> chiffre 4 -> exposant 3)
-int PremierExposant(long long Nombre){
+/*---------------------------
+Nom         |   PremierExposant
+Paramètre(s)|   long long Nombre
+Retourne    |   int ExposantDebut
+But         |   Trouver le premier exposant dont le chiffre n'est pas égal à 0.
+Exemple     |   Nombre = 4320 <> Chiffre 4 <> Exposant en base 10 = 3
+--------------------------- */
+ int PremierExposant(long long Nombre){
     auto ExposantDebut = static_cast<int>(floor(log10(Nombre)));
 
     return ExposantDebut;
 }
 
-// fonction pour trouver le chiffre d'un nombre donné selon son exposant (0 -> unité, 1 -> dizaine, ...)
+/*---------------------------
+Nom         |   PremierChiffre
+Paramètre(s)|   long long Nombre, int ChercheExposant
+Retourne    |   int ExposantDebut
+But         |   Trouver le chiffre d'un nombre donné selon son exposant en base 10.
+Exemple     |   Nombre = 213, ChercheExposant = 0 <> on veut retourner la valeur 3
+--------------------------- */
 int PremierChiffre(long long Nombre, int ChercheExposant){
     int ChiffreTrouve = 0;
     int ExposantDebut = PremierExposant(Nombre);
@@ -30,8 +47,14 @@ int PremierChiffre(long long Nombre, int ChercheExposant){
     return ChiffreTrouve;
 }
 
-// fonction pour séparer l'entier (à gauche de la virgule) et les décimales (à droite de la virgule)
-// pour arrondir les décimales et ajouter un à l'entier quand D > 99
+/*---------------------------
+Nom         |   ArrondirDecimales
+Paramètre(s)|   long double Montant, long long& Entier (référence)
+Retourne    |   int Decimales
+But         |   Séparer l'entier (à gauche de la virgule) et les décimales (à droite de la virgule),
+                pour arrondir les décimales et ajouter un à l'entier quand Decimales > 99.
+Exemple     |   Montant = 1.995 <> Entier = 2, Decimales = 0
+--------------------------- */
 int ArrondirDecimales(long double Montant, long long& Entier){
 
     Entier = static_cast<long long>(Montant);
@@ -44,32 +67,38 @@ int ArrondirDecimales(long double Montant, long long& Entier){
     return Decimales;
 }
 
-// fonction pour connaître la catégorie de l'exposant demandé
+/*---------------------------
+Nom         |   Categorie
+Paramètre(s)|   int Exposant
+Retourne    |   int valeur x
+But         |   Connaître la catégorie de l'exposant demandé
+Exemple     |   Exposant = 5 <> 3
+--------------------------- */
 int Categorie(int Exposant){
-    int ExposantCategorie = 0;
-
+    int Exp;
     switch (Exposant) {
         case 11:;
         case 10:;
-        case 9: ExposantCategorie = 9;
-            break;
+        case 9: return 9;
         case 8:;
         case 7:;
-        case 6: ExposantCategorie = 6;
-            break;
+        case 6: return 6;
         case 5:;
         case 4:;
-        case 3: ExposantCategorie = 3;
-            break;
+        case 3: return 3;
         case 2:;
         case 1:;
-        case 0: ExposantCategorie = 0;
-            break;
+        case 0: return 0;
     }
-    return ExposantCategorie;
 }
 
-// fonction pour décomposer l'entier en différentes catégories (milliard, millier, ...)
+/*---------------------------
+Nom         |   DecompositionMontantCategorie
+Paramètre(s)|   long long& Entier (référence), int ExposantCategorie
+Retourne    |   int Decomposition
+But         |   Décomposer l'entier selon catégorie
+Exemple     |   Entier = 75435, ExposantCategorie = 3 (millier) <> Decomposition = 75
+--------------------------- */
 int DecompositionMontantCategorie(long long& Entier, int ExposantCategorie){
     int Decomposition = 0;
     int ExposantDebut = 0;
@@ -88,49 +117,68 @@ int DecompositionMontantCategorie(long long& Entier, int ExposantCategorie){
     return Decomposition;
 }
 
+/*---------------------------
+Nom         |   ConversionNormale
+Paramètre(s)|   int Nombre
+Retourne    |   string valeur ""
+But         |   Convertir le nombre en string
+Exemple     |   Nombre = 14 <> quatorze
+--------------------------- */
 string ConversionNormale(int Nombre){
-    string Conversion;
 
     switch (Nombre) {
-        case 2: Conversion = "deux"; break;
-        case 3: Conversion = "trois"; break;
-        case 4: Conversion = "quatre"; break;
-        case 5: Conversion = "cinq"; break;
-        case 6: Conversion = "six"; break;
-        case 7: Conversion = "sept"; break;
-        case 8: Conversion = "huit"; break;
-        case 9: Conversion = "neuf"; break;
-        case 10: Conversion = "dix"; break;
-        case 11: Conversion = "onze"; break;
-        case 12: Conversion = "douze"; break;
-        case 13: Conversion = "treize"; break;
-        case 14: Conversion = "quatorze"; break;
-        case 15: Conversion = "quinze"; break;
-        case 16: Conversion = "seize"; break;
-        case 17: Conversion = "dix-sept"; break;
-        case 18: Conversion = "dix-huite"; break;
-        case 19: Conversion = "dix-neuf"; break;
+        case 2: return "deux";
+        case 3: return "trois";
+        case 4: return "quatre";
+        case 5: return "cinq";
+        case 6: return "six";
+        case 7: return "sept";
+        case 8: return "huit";
+        case 9: return "neuf";
+        case 10: return "dix";
+        case 11: return "onze";
+        case 12: return "douze";
+        case 13: return "treize";
+        case 14: return "quatorze";
+        case 15: return "quinze";
+        case 16: return "seize";
+        case 17: return "dix-sept";
+        case 18: return "dix-huit";
+        case 19: return "dix-neuf";
+        default: return  "";
     }
-    return Conversion;
 }
 
+/*---------------------------
+Nom         |   ConversionDizaine
+Paramètre(s)|   int Chiffre
+Retourne    |   string valeur ""
+But         |   Convertir le chiffre en string (pour les dizaines)
+Exemple     |   Chiffre = 4 <> quarante
+--------------------------- */
 string ConversionDizaine(int Chiffre){
-    string Conversion;
 
     switch (Chiffre) {
-        case 1: Conversion = "dix"; break;
-        case 2: Conversion = "vingt"; break;
-        case 3: Conversion = "trente"; break;
-        case 4: Conversion = "quarante"; break;
-        case 5: Conversion = "cinquante"; break;
-        case 6: Conversion = "soixante"; break;
-        case 7: Conversion = "septante"; break;
-        case 8: Conversion = "huitante"; break;
-        case 9: Conversion = "nonante"; break;
+        case 1: return "dix";
+        case 2: return "vingt";
+        case 3: return "trente";
+        case 4: return "quarante";
+        case 5: return "cinquante";
+        case 6: return "soixante";
+        case 7: return "septante";
+        case 8: return "huitante";
+        case 9: return "nonante";
+        default: return "";
     }
-    return Conversion;
 }
 
+/*---------------------------
+Nom         |   ConversionDeuxChiffres
+Paramètre(s)|   int Chiffre1, int Chiffre0, int Nombre
+Retourne    |   string Conversion
+But         |   Convertir le nombre (de 2 chiffres seulement), contrôle les cas spéciaux
+Exemple     |   Chiffre1 = 4, Chiffre0 = 1, Nombre = 41 <> Conversion = "quarante-et-un"
+--------------------------- */
 string ConversionDeuxChiffres(int Chiffre1, int Chiffre0, int Nombre){
     string Conversion;
 
@@ -147,6 +195,14 @@ string ConversionDeuxChiffres(int Chiffre1, int Chiffre0, int Nombre){
     }
     return  Conversion;
 }
+
+/*---------------------------
+Nom         |   ConversionCentaine
+Paramètre(s)|   int TroisChiffes, long long EntierReste
+Retourne    |   string Centaine
+But         |   Convertir le nombre (3 chiffres max), contrôle les cas spéciaux avec cent(s)
+Exemple     |   TroisChiffes = 143, EntierReste = 102 <> Centaine = "cent-quarante-trois"
+--------------------------- */
 string ConversionCentaine(int TroisChiffes, long long EntierReste){
     string Centaine;
     int Chiffre2 = PremierChiffre(TroisChiffes, 2);
@@ -180,15 +236,23 @@ string ConversionCentaine(int TroisChiffes, long long EntierReste){
     return Centaine;
 }
 
-string Conversion(int Centaine, int Categorie, long long Reste){
+/*---------------------------
+Nom         |   ConversionCentrale
+Paramètre(s)|   int Centaine, int Categorie, long long Reste
+Retourne    |   string Conversion
+But         |   Selon les différents cas de la langue française,
+                convertir le nombre en string selon la catégorie donnée
+Exemple     |   Centaine = 1, Categorie = 6, Reste = 0 <> Reste = "un-million de francs"
+--------------------------- */
+string ConversionCentrale(int Centaine, int Categorie, long long Reste){
     string Conversion;
     string ConvertiCentaine = ConversionCentaine(Centaine, Reste);
 
     switch (Categorie) {
         case 9:
-            Conversion = (Centaine > 1 ? ConvertiCentaine + "-" : (Centaine == 1 ? "un-" : "")) + "milliard" + (Centaine > 1 ? "s" : "") + (Reste > 0 ? "-" : " de francs")/* + (Reste == 1 ? "et-" : "")*/; break;
+            Conversion = (Centaine > 1 ? ConvertiCentaine + "-" : (Centaine == 1 ? "un-" : "")) + "milliard" + (Centaine > 1 ? "s" : "") + (Reste > 0 ? "-" : " de francs"); break;
         case 6:
-            Conversion += (Centaine > 1 ? ConvertiCentaine + "-" : (Centaine == 1 ? "un-" : "")) + "million" + (Centaine > 1 ? "s" : "") + (Reste > 0 ? "-" : " de francs")/* + (Reste == 1 ? "et-" : "")*/; break;
+            Conversion += (Centaine > 1 ? ConvertiCentaine + "-" : (Centaine == 1 ? "un-" : "")) + "million" + (Centaine > 1 ? "s" : "") + (Reste > 0 ? "-" : " de francs"); break;
         case 3:
             Conversion += (Centaine > 1 ? ConvertiCentaine + "-" : "") + "mille" + (Reste > 0 ? "-" : " francs"); break;
         case 0:
@@ -201,35 +265,45 @@ string Conversion(int Centaine, int Categorie, long long Reste){
     return Conversion;
 }
 
+/*---------------------------
+Nom         |   montantEnToutesLettres (Fonction principale)
+Paramètre(s)|   long double montant
+Retourne    |   string ConversionFinale
+But         |   - Contrôler l'entrée de l'utilisateur (0 <= montant < 10 puissance 12)
+                - Séparer le montant en entier et décimales
+                - Continuer à convertir l'entier tant que le nombre est plus grand que 0
+                - Contrôler les cas spéciaux (montant = 0, sans décimales, ...)
+Exemple     |   montant = 200200.02  <> ConversionFinale = "deux-cent-mille-deux-cents francs et -deux centimes"
+--------------------------- */
 string montantEnToutesLettres(long double montant) {
     const double MontantTropGrand = 1000000000000.;
     const double MontantTropPetit = 0.;
     long long Entier = 0;
     int Decimales = 0;
+    string ConversionFinale;
 
     Decimales = ArrondirDecimales(montant, Entier);
 
     // check la valeur entrée par l'utilisateur
     if (montant < MontantTropPetit){
         return "erreur : montant negatif";
-    } else if (Entier >= MontantTropGrand){
+    } else if (static_cast<double>(Entier) >= MontantTropGrand){
         return  "erreur : montant trop grand";
     } else {
 
         long long EntierTemp = Entier;
         string ConversionEntier;
         string ConversionDecimale;
-        string ConversionFinale;
         int Decomposition;
 
         while (EntierTemp > 0) {
             int NbCat = Categorie(PremierExposant(EntierTemp));
             Decomposition = DecompositionMontantCategorie(EntierTemp, NbCat);
-            ConversionEntier += Conversion(Decomposition, NbCat, EntierTemp);
+            ConversionEntier += ConversionCentrale(Decomposition, NbCat, EntierTemp);
         }
 
         if (Decimales > 0){
-            ConversionDecimale += Conversion(Decimales, -2, Decimales);
+            ConversionDecimale += ConversionCentrale(Decimales, -2, Decimales);
         }
 
         if (Entier == 0 and Decimales == 0){
@@ -242,7 +316,6 @@ string montantEnToutesLettres(long double montant) {
             ConversionFinale = ConversionEntier + " et " + ConversionDecimale;
         }
 
-        cout << endl;
         return ConversionFinale;
     }
 }
