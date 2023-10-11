@@ -75,20 +75,20 @@ But         |   Connaître la catégorie de l'exposant demandé
 Exemple     |   Exposant = 5 <> 3
 --------------------------- */
 int Categorie(int Exposant){
-    int Exp;
+
     switch (Exposant) {
         case 11:;
         case 10:;
-        case 9: return 9;
+        case 9: return 9; // -> milliard
         case 8:;
         case 7:;
-        case 6: return 6;
+        case 6: return 6; // -> million
         case 5:;
         case 4:;
-        case 3: return 3;
+        case 3: return 3; // -> mille
         case 2:;
         case 1:;
-        case 0: return 0;
+        default: return 0; // -> centaine+dizaine+unité
     }
 }
 
@@ -101,8 +101,8 @@ Exemple     |   Entier = 75435, ExposantCategorie = 3 (millier) <> Decomposition
 --------------------------- */
 int DecompositionMontantCategorie(long long& Entier, int ExposantCategorie){
     int Decomposition = 0;
-    int ExposantDebut = 0;
-    int ExposantReste = 0;
+    int ExposantDebut;
+    int ExposantReste;
     ExposantDebut = PremierExposant(Entier);
     ExposantReste = ExposantDebut - ExposantCategorie;
 
@@ -261,6 +261,7 @@ string ConversionCentrale(int Centaine, int Categorie, long long Reste){
             if (Centaine != 0){
                 Conversion += (Centaine > 1 ? ConvertiCentaine + " " : "un ") + "centime" + (Centaine > 1 ? "s" : "");
             } break;
+        default: cerr << "Erreur survenue lors dans la fonction ConversionCentrale"; // valeur default du switch jamais atteint dans ce programme, seulement ici pour ne pas avoir le warning jaune
     }
     return Conversion;
 }
@@ -279,7 +280,7 @@ string montantEnToutesLettres(long double montant) {
     const double MontantTropGrand = 1000000000000.;
     const double MontantTropPetit = 0.;
     long long Entier = 0;
-    int Decimales = 0;
+    int Decimales;
     string ConversionFinale;
 
     Decimales = ArrondirDecimales(montant, Entier);
