@@ -178,6 +178,8 @@ string ConversionDeuxChiffres(int Chiffre1, int Chiffre0, int Nombre){
         }
     } else if (Nombre < 10){
         return ConversionNormale(Chiffre0);
+    } else { // pour éviter l'erreur à la compilation - warning: control reaches end of non-void function -> un retour pour tout autre condition est nécessaire (même si dans notre code, cette condition n'est jamais présente)
+        return "";
     }
 }
 /*---------------------------
