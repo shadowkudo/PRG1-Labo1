@@ -13,19 +13,19 @@ using namespace std;
 
 // fonction pour trouver le premier exposant dont le chiffre est différent de 1 (4320 -> chiffre 4 -> exposant 3)
 int PremierExposant(long long Nombre){
-    auto ExposantStart = static_cast<int>(floor(log10(Nombre)));
+    auto ExposantDebut = static_cast<int>(floor(log10(Nombre)));
 
-    return ExposantStart;
+    return ExposantDebut;
 }
 
 // fonction pour trouver le chiffre d'un nombre donné selon son exposant (0 -> unité, 1 -> dizaine, ...)
 int PremierChiffre(long long Nombre, int ChercheExposant){
     int ChiffreTrouve = 0;
-    int ExposantStart = PremierExposant(Nombre);
+    int ExposantDebut = PremierExposant(Nombre);
 
-    for (; ExposantStart >= ChercheExposant; ExposantStart--) {
-        ChiffreTrouve = static_cast<int>(trunc(static_cast<long double>(Nombre) / pow(10, ExposantStart)));
-        Nombre -= static_cast<long long>(ChiffreTrouve * pow(10, ExposantStart));
+    for (; ExposantDebut >= ChercheExposant; ExposantDebut--) {
+        ChiffreTrouve = static_cast<int>(trunc(static_cast<long double>(Nombre) / pow(10, ExposantDebut)));
+        Nombre -= static_cast<long long>(ChiffreTrouve * pow(10, ExposantDebut));
     }
     return ChiffreTrouve;
 }
@@ -45,42 +45,42 @@ int ArrondirDecimales(long double Montant, long long& Entier){
 }
 
 // fonction pour connaître la catégorie de l'exposant demandé
-int Category(int Exposant){
-    int ExposantCategory = 0;
+int Categorie(int Exposant){
+    int ExposantCategorie = 0;
 
     switch (Exposant) {
         case 11:;
         case 10:;
-        case 9: ExposantCategory = 9;
+        case 9: ExposantCategorie = 9;
             break;
         case 8:;
         case 7:;
-        case 6: ExposantCategory = 6;
+        case 6: ExposantCategorie = 6;
             break;
         case 5:;
         case 4:;
-        case 3: ExposantCategory = 3;
+        case 3: ExposantCategorie = 3;
             break;
         case 2:;
         case 1:;
-        case 0: ExposantCategory = 0;
+        case 0: ExposantCategorie = 0;
             break;
     }
-    return ExposantCategory;
+    return ExposantCategorie;
 }
 
 // fonction pour décomposer l'entier en différentes catégories (milliard, millier, ...)
-int DecompositionMontantCategory(long long& Entier, int ExposantCategory){
+int DecompositionMontantCategorie(long long& Entier, int ExposantCategorie){
     int Decomposition = 0;
-    int ExposantStart = 0;
+    int ExposantDebut = 0;
     int ExposantReste = 0;
-    ExposantStart = PremierExposant(Entier);
-    ExposantReste = ExposantStart - ExposantCategory;
+    ExposantDebut = PremierExposant(Entier);
+    ExposantReste = ExposantDebut - ExposantCategorie;
 
-    for (; ExposantStart >= ExposantCategory; ExposantStart--) {
+    for (; ExposantDebut >= ExposantCategorie; ExposantDebut--) {
 
-        auto NbTemp = static_cast<long long>(floor(static_cast<long double>(Entier) / pow(10, ExposantStart)));
-        Entier -= static_cast<long long>(static_cast<long double>(NbTemp) * pow(10, ExposantStart));
+        auto NbTemp = static_cast<long long>(floor(static_cast<long double>(Entier) / pow(10, ExposantDebut)));
+        Entier -= static_cast<long long>(static_cast<long double>(NbTemp) * pow(10, ExposantDebut));
         Decomposition += static_cast<int>(static_cast<long double>(NbTemp) * pow(10, ExposantReste));
         ExposantReste--;
 
@@ -114,22 +114,6 @@ string ConversionNormale(int Nombre){
     return Conversion;
 }
 
-/*string ConversionUnite(int Chiffre){
-    string Conversion;
-
-    switch (Chiffre) {
-        case 2: Conversion = "deux"; break;
-        case 3: Conversion = "trois"; break;
-        case 4: Conversion = "quatre"; break;
-        case 5: Conversion = "cinq"; break;
-        case 6: Conversion = "six"; break;
-        case 7: Conversion = "sept"; break;
-        case 8: Conversion = "huit"; break;
-        case 9: Conversion = "neuf"; break;
-    }
-    return Conversion;
-}*/
-
 string ConversionDizaine(int Chiffre){
     string Conversion;
 
@@ -146,24 +130,6 @@ string ConversionDizaine(int Chiffre){
     }
     return Conversion;
 }
-
-/*string ConversionSpecial(int Nombre){
-    string Conversion;
-
-    switch (Nombre) {
-        case 10: Conversion = "dix"; break;
-        case 11: Conversion = "onze"; break;
-        case 12: Conversion = "douze"; break;
-        case 13: Conversion = "treize"; break;
-        case 14: Conversion = "quatorze"; break;
-        case 15: Conversion = "quinze"; break;
-        case 16: Conversion = "seize"; break;
-        case 17: Conversion = "dix-sept"; break;
-        case 18: Conversion = "dix-huite"; break;
-        case 19: Conversion = "dix-neuf"; break;
-    }
-    return Conversion;
-}*/
 
 string ConversionDeuxChiffres(int Chiffre1, int Chiffre0, int Nombre){
     string Conversion;
@@ -252,8 +218,8 @@ string montantEnToutesLettres(long double montant) {
         int Decomposition;
 
         while (EntierTemp > 0) {
-            int NbCat = Category(PremierExposant(EntierTemp));
-            Decomposition = DecompositionMontantCategory(EntierTemp, NbCat);
+            int NbCat = Categorie(PremierExposant(EntierTemp));
+            Decomposition = DecompositionMontantCategorie(EntierTemp, NbCat);
             ConversionEntier += Conversion(Decomposition, NbCat, EntierTemp);
         }
 
