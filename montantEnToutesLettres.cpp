@@ -6,8 +6,8 @@ Date fin    |   12.10.2023 (2359)
 But         |   convertisseur nombre mathématique au langage français
 Remarque(s) |   - pas de tableaux, pas de redondance de code, pas de plagiat
                 - règles du Français respectées selon https://www.dictionnaire-academie.fr/article/QDL057
-                - arrondi 0.995 à 1.00
-Source(s)   |   - static_cast   ->  https://en.cppreference.com/w/cpp/language/static_cast <> pour convertir les différents types de données nombre (p. ex : long double à long long)
+                - arrondi 0.995 à 1.00 et 0.994 à 0.99
+Sources     |   - static_cast   ->  https://en.cppreference.com/w/cpp/language/static_cast <> pour convertir les différents types de données nombre (p. ex : long double à long long)
                 - floor()       ->  https://en.cppreference.com/w/cpp/numeric/math/floor <> fonction mathématique
                 - round()       ->  https://en.cppreference.com/w/cpp/numeric/math/round <> fonction mathématique
                 - trunc()       ->  https://en.cppreference.com/w/cpp/numeric/math/trunc <> fonction mathématique
